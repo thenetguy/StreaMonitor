@@ -1,12 +1,19 @@
 version: "3.7"
 
 services:
-  streamonitor:
+  stream_monitor:
+    container_name: stream_monitor_container
     build: ./
-    image: streamonitor:latest
+    image: stream_monitor:latest
     volumes:
       - ./downloads:/app/downloads
       - ./config.json:/app/config.json
       - ./parameters.py:/app/parameters.py
-    ports:
-      - '6969:6969'
+    networks:
+      - cloudflared_network
+    # ports:
+    #   - '6969:6969'
+
+networks:
+  cloudflared_network:
+    external: true

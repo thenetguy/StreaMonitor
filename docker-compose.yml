@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   stream_monitor:
-    container_name: stream_monitor_container
+    container_name: StreaMonitor
     build: ./
     image: stream_monitor:latest
     volumes:

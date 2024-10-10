@@ -18,7 +18,7 @@ class Chaturbate(Bot):
         data = [{"username": self.username}]
 
         try:
-            r = requests.post("https://cf.netconnect.work/api", headers=headers, json=data)
+            r = requests.post("https://cf.netconnect.work/check_status", headers=headers, json=data)
             result = r.json()[0]
 
             if result["status"] == "PUBLIC":

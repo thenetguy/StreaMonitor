@@ -6,7 +6,7 @@ HTTP_USER_AGENT = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:75.0) Gecko/201001
 # You can enter a number to select a specific height.
 # Use a huge number here and closest match to get the highest resolution variant
 # Eg: 240, 360, 480, 720, 1080, 1440, 99999
-WANTED_RESOLUTION = 1080
+WANTED_RESOLUTION = 720
 
 # Specify match type when specified height
 # Possible values: exact, exact_or_least_higher, exact_or_highest_lower, closest

@@ -23,7 +23,8 @@ def getVideoFfmpeg(self, url, filename):
    
    cmd.extend([
        '-i', url,
-       '-fflags', '+genpts',  # Generate fresh timestamps
+       '-fflags', '+genpts',
+       '-copytb', '1',  # Use demuxer timebase
        '-c:a', 'copy',
        '-c:v', 'copy',
    ])
@@ -32,7 +33,7 @@ def getVideoFfmpeg(self, url, filename):
        username = filename.rsplit('-', maxsplit=2)[0]
        cmd.extend([
            '-f', 'segment',
-           '-start_at_zero',  # Add this line
+           '-start_at_zero',
            '-reset_timestamps', '1',
            '-segment_time', str(SEGMENT_TIME),
            '-strftime', '1',

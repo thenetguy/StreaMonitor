@@ -4,8 +4,6 @@ import sys
 import requests.cookies
 from threading import Thread
 from parameters import DEBUG, SEGMENT_TIME, CONTAINER
-from datetime import datetime
-import os
 
 def getVideoFfmpeg(self, url, filename):
    cmd = [
@@ -33,8 +31,9 @@ def getVideoFfmpeg(self, url, filename):
        username = filename.rsplit('-', maxsplit=2)[0]
        cmd.extend([
            '-f', 'segment',
+           '-reset_timestamps', '1',
            '-segment_time', str(SEGMENT_TIME),
-           f'{username}_%03d.{CONTAINER}'  # Just use numbers, we'll rename with timestamps
+           f'{username}_%03d.{CONTAINER}'
        ])
    else:
        cmd.extend([
@@ -67,37 +66,14 @@ def getVideoFfmpeg(self, url, filename):
                startupinfo=startupinfo
            )
 
-           # Monitor for new segments and rename them with current timestamp
-           if SEGMENT_TIME is not None:
-               while process.poll() is None:
-                   if stopping.stop:
-                       process.communicate(b'q')
-                       break
-                   try:
-                       process.wait(1)
-                       # Check for new segment files and rename them
-                       for f in os.listdir('.'):
-                           if f.startswith(username) and f.endswith(f'.{CONTAINER}'):
-                               if '_' in f:  # Only rename numbered files
-                                   now = datetime.now()
-                                   new_name = f'{username}-{now.strftime("%Y%m%d-%H%M%S")}.{CONTAINER}'
-                                   try:
-                                       os.rename(f, new_name)
-                                   except Exception as e:
-                                       if DEBUG:
-                                           print(f"Error renaming file {f}: {str(e)}")
-                                       pass
-                   except subprocess.TimeoutExpired:
-                       pass
-           else:
-               while process.poll() is None:
-                   if stopping.stop:
-                       process.communicate(b'q')
-                       break
-                   try:
-                       process.wait(1)
-                   except subprocess.TimeoutExpired:
-                       pass
+           while process.poll() is None:
+               if stopping.stop:
+                   process.communicate(b'q')
+                   break
+               try:
+                   process.wait(1)
+               except subprocess.TimeoutExpired:
+                   pass
 
        except OSError as e:
            if e.errno == errno.ENOENT:

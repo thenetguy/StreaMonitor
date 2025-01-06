@@ -1,18 +1,16 @@
 import errno
 import subprocess
 import sys
-
 import requests.cookies
 from threading import Thread
 from parameters import DEBUG, SEGMENT_TIME, CONTAINER
-
 
 def getVideoFfmpeg(self, url, filename):
     cmd = [
         'ffmpeg',
         '-user_agent', self.headers['User-Agent']
     ]
-
+    
     if type(self.cookies) is requests.cookies.RequestsCookieJar:
         cookies_text = ''
         for cookie in self.cookies:
@@ -22,9 +20,10 @@ def getVideoFfmpeg(self, url, filename):
         cmd.extend([
             '-cookies', cookies_text
         ])
-
+    
     cmd.extend([
         '-i', url,
+        '-fflags', '+genpts',  # Generate fresh timestamps
         '-c:a', 'copy',
         '-c:v', 'copy',
     ])
@@ -46,13 +45,12 @@ def getVideoFfmpeg(self, url, filename):
     class _Stopper:
         def __init__(self):
             self.stop = False
-
         def pls_stop(self):
             self.stop = True
 
     stopping = _Stopper()
-
     error = False
+
     def execute():
         nonlocal error
         try:
@@ -63,7 +61,12 @@ def getVideoFfmpeg(self, url, filename):
                 startupinfo = subprocess.STARTUPINFO()
                 startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
             process = subprocess.Popen(
-                args=cmd, stdin=subprocess.PIPE, stderr=stderr, stdout=stdout, startupinfo=startupinfo)
+                args=cmd, 
+                stdin=subprocess.PIPE, 
+                stderr=stderr, 
+                stdout=stdout, 
+                startupinfo=startupinfo
+            )
         except OSError as e:
             if e.errno == errno.ENOENT:
                 self.logger.error('FFMpeg executable not found!')
